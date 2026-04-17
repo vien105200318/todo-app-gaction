@@ -41,15 +41,31 @@ jobs:
 
       - name: Package App
         run: |
-          cd ios/build/Build/Products/Debug-iphonesimulator
-          zip -r TodoApp.app.zip TodoApp.app
-          mv TodoApp.app.zip ../../../../../
+          # Tìm file .app
+          APP_PATH=$(find ios/build/Build/Products/Debug-iphonesimulator -name "*.app" -type d | head -n 1)
+          echo "Found app at: $APP_PATH"
+          
+          # Zip file
+          if [ -d "$APP_PATH" ]; then
+            cd $(dirname "$APP_PATH")
+            zip -r TodoApp.app.zip $(basename "$APP_PATH")
+            mv TodoApp.app.zip $GITHUB_WORKSPACE/
+            echo "✅ Created TodoApp.app.zip"
+          else
+            echo "❌ App not found!"
+            exit 1
+          fi
+
+      - name: Verify file exists
+        run: |
+          ls -lh TodoApp.app.zip
+          echo "File size: $(du -h TodoApp.app.zip | cut -f1)"
 
       - name: Upload App
         uses: actions/upload-artifact@v4
         with:
           name: TodoApp-Debug-${{ github.run_number }}
-          path: ios/TodoApp.app.zip
+          path: TodoApp.app.zip
           retention-days: 30
 
       - name: Build Info
