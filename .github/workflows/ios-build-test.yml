@@ -1,0 +1,102 @@
+name: iOS Build Test (Debug)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install npm dependencies
+        run: |
+          npm ci
+          echo "✅ npm dependencies installed"
+
+      - name: Check native modules
+        run: |
+          echo "📋 Checking native modules in package.json..."
+          cat package.json | grep -A 10 '"dependencies"'
+          echo ""
+          echo "📦 Installed native modules:"
+          npm list --depth=0 | grep -E "reanimated|gesture-handler|haptic|gradient" || echo "No native modules found"
+
+      - name: Install Pods
+        run: |
+          cd ios
+          echo "🍎 Installing CocoaPods..."
+          pod install --verbose
+          echo ""
+          echo "✅ Pods installed"
+          echo ""
+          echo "📋 Installed pods:"
+          cat Podfile.lock | grep -E "RNReanimated|RNGestureHandler|RNReactNativeHapticFeedback|BVLinearGradient" || echo "Native module pods not found"
+
+      - name: List Xcode schemes
+        run: |
+          cd ios
+          xcodebuild -list -workspace TodoApp.xcworkspace
+
+      - name: Bundle React Native
+        run: |
+          echo "📦 Bundling React Native..."
+          npx react-native bundle \
+            --platform ios \
+            --dev false \
+            --entry-file index.js \
+            --bundle-output ios/main.jsbundle \
+            --assets-dest ios
+          
+          echo "✅ Bundle created"
+          ls -lh ios/main.jsbundle
+
+      - name: Build for Simulator (Test)
+        run: |
+          cd ios
+          
+          echo "🏗️  Building for simulator (test build)..."
+          
+          xcodebuild \
+            -workspace TodoApp.xcworkspace \
+            -scheme TodoApp \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -arch x86_64 \
+            -derivedDataPath ./build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            build | tee build.log
+          
+          if [ ${PIPESTATUS[0]} -eq 0 ]; then
+            echo "✅ Simulator build succeeded!"
+          else
+            echo "❌ Build failed. Last 100 lines:"
+            tail -100 build.log
+            exit 1
+          fi
+
+      - name: Build Summary
+        if: always()
+        run: |
+          echo "=========================================="
+          echo "📊 Build Test Summary"
+          echo "=========================================="
+          echo ""
+          if [ -f ios/build.log ]; then
+            echo "Build log exists"
+            echo "Errors:"
+            grep -i "error:" ios/build.log | head -20 || echo "No errors found"
+            echo ""
+            echo "Warnings:"
+            grep -i "warning:" ios/build.log | head -10 || echo "No warnings found"
+          fi

@@ -17,7 +17,15 @@ jobs:
           node-version: '20'
 
       - name: Install npm dependencies
-        run: npm install
+        run: |
+          echo "📦 Installing npm dependencies..."
+          # Remove old lock file to ensure fresh install
+          rm -f package-lock.json
+          npm install
+          echo "✅ Dependencies installed"
+          echo ""
+          echo "📋 Checking new native modules..."
+          npm list react-native-reanimated react-native-gesture-handler react-native-haptic-feedback react-native-linear-gradient || true
 
       - name: Bundle React Native
         run: |
@@ -40,7 +48,27 @@ jobs:
       - name: Install Pods
         run: |
           cd ios
-          pod install
+          # Clean pod cache first
+          pod cache clean --all || true
+          # Remove old pods
+          rm -rf Pods
+          rm -rf Podfile.lock
+          # Fresh install
+          pod install --repo-update
+          echo "✅ Pods installed"
+
+      - name: Verify Native Modules
+        run: |
+          cd ios
+          echo "📋 Checking installed pods..."
+          grep -E "RNReanimated|RNGestureHandler|RNReactNativeHapticFeedback|BVLinearGradient" Podfile.lock || echo "⚠️  Some native modules not found in Podfile.lock"
+          
+          echo ""
+          echo "📦 Checking workspace..."
+          ls -la TodoApp.xcworkspace
+          
+          echo ""
+          echo "✅ Verification complete"
 
       - name: Modify Info.plist for unsigned build
         run: |
@@ -57,6 +85,8 @@ jobs:
           echo "🏗️  Building for device..."
           echo "Note: Bundle script will be skipped (SKIP_BUNDLING=1)"
           
+          set -o pipefail
+          
           xcodebuild \
             -workspace TodoApp.xcworkspace \
             -scheme TodoApp \
@@ -69,7 +99,16 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             ENABLE_BITCODE=NO \
-            clean build
+            clean build 2>&1 | tee build.log
+          
+          # Check if build succeeded
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "❌ Build failed! Last 50 lines of log:"
+            tail -50 build.log
+            exit 1
+          fi
+          
+          echo "✅ Build succeeded"
 
       - name: Create IPA with proper structure
         run: |
