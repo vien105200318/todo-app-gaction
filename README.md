@@ -33,6 +33,55 @@ npm run ios
 npm run android
 ```
 
+## Build với GitHub Actions
+
+### 🎯 2 Cách build
+
+#### Cách 1: Build không cần certificate (Khuyên dùng cho test)
+
+**Ưu điểm:**
+- ✅ Không cần certificate
+- ✅ Không cần provisioning profile
+- ✅ Không cần setup secrets
+- ✅ Build nhanh (5-10 phút)
+
+**Nhược điểm:**
+- ⚠️ Chỉ chạy trên iOS Simulator
+- ⚠️ Không cài được lên iPhone thật
+
+**Cách dùng:**
+1. Push code lên GitHub
+2. Workflow tự động chạy
+3. Tải file từ Artifacts
+4. Chạy trên Xcode Simulator
+
+**Workflow:** `ios-build-simple.yml` (đã active)
+
+---
+
+#### Cách 2: Build có certificate (Cho thiết bị thật)
+
+**Ưu điểm:**
+- ✅ Cài được lên iPhone thật
+- ✅ File IPA đầy đủ
+- ✅ Có thể distribute
+
+**Nhược điểm:**
+- ⚠️ Cần certificate từ Apple Developer
+- ⚠️ Cần provisioning profile
+- ⚠️ Cần setup 4 secrets
+- ⚠️ Build lâu hơn (10-15 phút)
+
+**Cách dùng:**
+1. Thêm 4 secrets vào GitHub (xem bên dưới)
+2. Chạy workflow manually
+3. Tải IPA từ Artifacts
+4. Cài lên iPhone
+
+**Workflow:** `ios-build-signed.yml`
+
+---
+
 ## Build IPA với GitHub Actions
 
 ### 📚 Hướng dẫn chi tiết
