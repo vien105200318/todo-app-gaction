@@ -47,13 +47,11 @@ jobs:
         run: |
           echo "🔐 Importing Enterprise Certificate..."
           
-          # Tạo keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security set-keychain-settings -t 3600 -u build.keychain
           
-          # Import certificate
           echo "$CERTIFICATE_BASE64" | base64 --decode > certificate.p12
           security import certificate.p12 -k build.keychain -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
@@ -86,14 +84,10 @@ jobs:
             clean archive \
             -archivePath ./build/TodoApp.xcarchive
 
-      - name: Export IPA
+      - name: Create Export Options
         run: |
           cd ios
-          
-          echo "📦 Exporting IPA..."
-          
-          # Tạo export options plist
-          cat > ExportOptions.plist <<'EOF'
+          cat > ExportOptions.plist << 'ENDOFFILE'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -110,17 +104,19 @@ jobs:
     <false/>
 </dict>
 </plist>
-EOF
+ENDOFFILE
+
+      - name: Export IPA
+        run: |
+          cd ios
           
-          # Export
+          echo "📦 Exporting IPA..."
           xcodebuild -exportArchive \
             -archivePath ./build/TodoApp.xcarchive \
             -exportPath ./build \
             -exportOptionsPlist ExportOptions.plist
           
-          # Move IPA
           mv ./build/TodoApp.ipa $GITHUB_WORKSPACE/
-          
           echo "✅ IPA exported"
 
       - name: Verify IPA
@@ -130,8 +126,6 @@ EOF
           echo ""
           echo "Size: $(du -h TodoApp.ipa | cut -f1)"
           echo ""
-          
-          # Kiểm tra bundle
           unzip -l TodoApp.ipa | grep -E "main.jsbundle|TodoApp.app" | head -10
 
       - name: Upload IPA
@@ -161,9 +155,4 @@ EOF
           echo "   1. Tải IPA từ Artifacts"
           echo "   2. Cài trực tiếp (đã sign sẵn)"
           echo "   3. Hoặc distribute qua MDM"
-          echo ""
-          echo "⚠️  Lưu ý:"
-          echo "   - IPA đã được sign bằng Enterprise cert"
-          echo "   - Có thể cài trực tiếp lên iPhone"
-          echo "   - Không cần sign lại bằng ESign"
           echo ""
