@@ -49,8 +49,14 @@ jobs:
           /usr/libexec/PlistBuddy -c "Add :UIRequiredDeviceCapabilities:0 string arm64" Info.plist || true
 
       - name: Build for Device
+        env:
+          SKIP_BUNDLING: 1
         run: |
           cd ios
+          
+          echo "🏗️  Building for device..."
+          echo "Note: Bundle script will be skipped (SKIP_BUNDLING=1)"
+          
           xcodebuild \
             -workspace TodoApp.xcworkspace \
             -scheme TodoApp \
