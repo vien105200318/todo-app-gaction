@@ -1,0 +1,91 @@
+name: iOS Build for Device (For ESign/TrollStore)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Install Pods
+        run: |
+          cd ios
+          pod install
+
+      - name: Build for Device (arm64)
+        run: |
+          cd ios
+          xcodebuild \
+            -workspace TodoApp.xcworkspace \
+            -scheme TodoApp \
+            -configuration Release \
+            -sdk iphoneos \
+            -arch arm64 \
+            -derivedDataPath ./build \
+            clean build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Create IPA
+        run: |
+          cd ios/build/Build/Products/Release-iphoneos
+          
+          # Tạo thư mục Payload
+          mkdir -p Payload
+          cp -r TodoApp.app Payload/
+          
+          # Tạo IPA
+          zip -r TodoApp.ipa Payload
+          
+          # Move về workspace root
+          mv TodoApp.ipa $GITHUB_WORKSPACE/
+          
+          echo "✅ Created TodoApp.ipa"
+
+      - name: Verify IPA
+        run: |
+          ls -lh TodoApp.ipa
+          echo "File size: $(du -h TodoApp.ipa | cut -f1)"
+          
+          # Kiểm tra architecture
+          unzip -l TodoApp.ipa | grep -E "TodoApp$|arm64"
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: TodoApp-Device-IPA-${{ github.run_number }}
+          path: TodoApp.ipa
+          retention-days: 30
+
+      - name: Build Info
+        run: |
+          echo "=========================================="
+          echo "✅ Build thành công!"
+          echo "=========================================="
+          echo ""
+          echo "📦 File: TodoApp.ipa"
+          echo "🎯 Platform: iOS Device (iPhone/iPad)"
+          echo "🏗️  Architecture: arm64"
+          echo "⚙️  Configuration: Release"
+          echo ""
+          echo "📥 Tải về từ Artifacts"
+          echo "🔐 Sign bằng ESign/TrollStore/Sideloadly"
+          echo ""
+          echo "⚠️  Lưu ý:"
+          echo "   - File này cần SIGN trước khi cài"
+          echo "   - Dùng ESign, TrollStore, hoặc Sideloadly"
+          echo "   - Không thể chạy trên Simulator"
+          echo ""

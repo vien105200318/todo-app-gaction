@@ -1,0 +1,156 @@
+name: iOS Build Release (Ready for ESign)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Bundle React Native
+        run: |
+          echo "📦 Bundling React Native..."
+          
+          # Tạo thư mục nếu chưa có
+          mkdir -p ios/build
+          
+          # Bundle JavaScript
+          npx react-native bundle \
+            --platform ios \
+            --dev false \
+            --entry-file index.js \
+            --bundle-output ios/main.jsbundle \
+            --assets-dest ios
+          
+          echo "✅ Bundle created at ios/main.jsbundle"
+          ls -lh ios/main.jsbundle
+
+      - name: Install Pods
+        run: |
+          cd ios
+          pod install
+
+      - name: Modify Info.plist for unsigned build
+        run: |
+          cd ios/TodoApp
+          /usr/libexec/PlistBuddy -c "Set :UIRequiredDeviceCapabilities:0 arm64" Info.plist || true
+          /usr/libexec/PlistBuddy -c "Add :UIRequiredDeviceCapabilities:0 string arm64" Info.plist || true
+
+      - name: Build for Device
+        run: |
+          cd ios
+          xcodebuild \
+            -workspace TodoApp.xcworkspace \
+            -scheme TodoApp \
+            -configuration Release \
+            -sdk iphoneos \
+            -arch arm64 \
+            -derivedDataPath ./build \
+            ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            ENABLE_BITCODE=NO \
+            clean build
+
+      - name: Create IPA with proper structure
+        run: |
+          cd ios/build/Build/Products/Release-iphoneos
+          
+          echo "📦 Creating IPA structure..."
+          
+          # Tạo thư mục Payload
+          mkdir -p Payload
+          
+          # Copy app
+          cp -r TodoApp.app Payload/
+          
+          # Copy main.jsbundle vào app
+          echo "📋 Copying main.jsbundle..."
+          if [ -f "../../../../main.jsbundle" ]; then
+            cp ../../../../main.jsbundle Payload/TodoApp.app/
+            echo "✅ main.jsbundle copied"
+          else
+            echo "❌ main.jsbundle not found!"
+            exit 1
+          fi
+          
+          # Copy assets nếu có
+          if [ -d "../../../../assets" ]; then
+            cp -r ../../../../assets Payload/TodoApp.app/
+            echo "✅ Assets copied"
+          fi
+          
+          # Verify bundle exists
+          if [ ! -f "Payload/TodoApp.app/main.jsbundle" ]; then
+            echo "❌ main.jsbundle missing in app!"
+            exit 1
+          fi
+          
+          echo "✅ Bundle verified in app"
+          ls -lh Payload/TodoApp.app/main.jsbundle
+          
+          # Tạo IPA
+          echo "🗜️  Creating IPA..."
+          zip -r TodoApp.ipa Payload
+          
+          # Move về workspace root
+          mv TodoApp.ipa $GITHUB_WORKSPACE/
+          
+          echo "✅ IPA created successfully"
+
+      - name: Verify IPA structure
+        run: |
+          echo "📦 IPA Info:"
+          ls -lh TodoApp.ipa
+          echo ""
+          echo "File size: $(du -h TodoApp.ipa | cut -f1)"
+          echo ""
+          echo "📋 Contents:"
+          unzip -l TodoApp.ipa | grep -E "TodoApp.app|jsbundle|arm64" | head -20
+          echo ""
+          echo "🏗️  Architecture:"
+          unzip -p TodoApp.ipa Payload/TodoApp.app/TodoApp | file - || echo "Binary check skipped"
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: TodoApp-Release-${{ github.run_number }}
+          path: TodoApp.ipa
+          retention-days: 30
+
+      - name: Build Summary
+        run: |
+          echo "=========================================="
+          echo "✅ Build hoàn tất!"
+          echo "=========================================="
+          echo ""
+          echo "📦 File: TodoApp.ipa"
+          echo "📱 Device: iPhone XR và mới hơn"
+          echo "🏗️  Architecture: arm64"
+          echo "⚙️  Configuration: Release"
+          echo "📦 React Native: Bundled"
+          echo ""
+          echo "📥 Cách cài đặt:"
+          echo "   1. Tải IPA từ Artifacts"
+          echo "   2. Sign bằng ESign/Sideloadly"
+          echo "   3. Cài lên iPhone"
+          echo "   4. Trust certificate trong Settings"
+          echo ""
+          echo "⚠️  Lưu ý:"
+          echo "   - File này ĐÃ bundle React Native"
+          echo "   - Hỗ trợ iPhone XR trở lên"
+          echo "   - Cần sign trước khi cài"
+          echo ""
