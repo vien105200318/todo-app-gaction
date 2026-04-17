@@ -1,0 +1,42 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build iOS app"
+  lane :build_app do
+    # Tăng build number
+    increment_build_number(
+      xcodeproj: "TodoApp.xcodeproj"
+    )
+
+    # Build app
+    gym(
+      scheme: "TodoApp",
+      workspace: "TodoApp.xcworkspace",
+      export_method: "development",
+      output_directory: "./build",
+      output_name: "TodoApp.ipa",
+      clean: true,
+      export_options: {
+        provisioningProfiles: {
+          "com.todoapp" => "TodoApp Development"
+        }
+      }
+    )
+  end
+
+  desc "Build for App Store"
+  lane :release do
+    increment_build_number(
+      xcodeproj: "TodoApp.xcodeproj"
+    )
+
+    gym(
+      scheme: "TodoApp",
+      workspace: "TodoApp.xcworkspace",
+      export_method: "app-store",
+      output_directory: "./build",
+      output_name: "TodoApp.ipa",
+      clean: true
+    )
+  end
+end

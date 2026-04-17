@@ -1,97 +1,105 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Todo App - React Native
 
-# Getting Started
+Ứng dụng Todo đơn giản được xây dựng bằng React Native với tính năng:
+- ✅ Thêm công việc mới
+- ✅ Đánh dấu hoàn thành
+- ✅ Xóa công việc
+- ✅ Đếm số công việc chưa hoàn thành
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Yêu cầu
 
-## Step 1: Start Metro
+- Node.js 18+
+- React Native CLI
+- Xcode (cho iOS)
+- CocoaPods
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Cài đặt
 
-To start the Metro dev server, run the following command from the root of your React Native project:
-
-```sh
-# Using npm
-npm start
-
-# OR using Yarn
-yarn start
+```bash
+cd TodoApp
+npm install
+cd ios && pod install && cd ..
 ```
 
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
+## Chạy ứng dụng
 
 ### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+```bash
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### Android
+```bash
+npm run android
+```
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## Build IPA với GitHub Actions
 
-## Step 3: Modify your app
+### 📚 Hướng dẫn chi tiết
 
-Now that you have successfully run the app, let's make changes!
+Chọn hướng dẫn phù hợp với bạn:
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+1. **[QUICK_START.md](QUICK_START.md)** - Hướng dẫn nhanh với hình minh họa
+2. **[GITHUB_SECRETS_GUIDE.md](GITHUB_SECRETS_GUIDE.md)** - Chi tiết cách thêm secrets
+3. **[SETUP_GUIDE.md](SETUP_GUIDE.md)** - Hướng dẫn đầy đủ từ A-Z
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+### ⚡ Tóm tắt nhanh
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+**Bước 1:** Chuẩn bị certificate và provisioning profile từ Apple Developer
 
-## Congratulations! :tada:
+**Bước 2:** Encode sang base64
+```bash
+base64 -i certificate.p12 | pbcopy
+base64 -i profile.mobileprovision | pbcopy
+```
 
-You've successfully run and modified your React Native App. :partying_face:
+**Bước 3:** Thêm vào GitHub Secrets
+- Vào: `Settings → Secrets and variables → Actions → New repository secret`
+- Thêm 4 secrets:
+  - `APPLE_CERTIFICATE_BASE64`
+  - `APPLE_CERTIFICATE_PASSWORD`
+  - `PROVISIONING_PROFILE_BASE64`
+  - `KEYCHAIN_PASSWORD`
 
-### Now what?
+**Bước 4:** Push code và đợi build
+```bash
+git push origin main
+```
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+**Bước 5:** Tải IPA từ tab Actions → Artifacts
 
-# Troubleshooting
+## Cấu trúc thư mục
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+```
+TodoApp/
+├── src/
+│   ├── components/
+│   │   └── TodoItem.tsx
+│   └── screens/
+│       └── TodoScreen.tsx
+├── ios/
+│   ├── Fastfile
+│   └── Gemfile
+├── .github/
+│   └── workflows/
+│       └── ios-build.yml
+└── App.tsx
+```
 
-# Learn More
+## Fastlane Commands
 
-To learn more about React Native, take a look at the following resources:
+```bash
+cd ios
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+# Build development
+fastlane build_app
+
+# Build for App Store
+fastlane release
+```
+
+## Lưu ý
+
+- Cần có Apple Developer Account để tạo certificate và provisioning profile
+- Build IPA yêu cầu macOS runner (GitHub Actions free tier có giới hạn)
+- File IPA được lưu trong Artifacts trong 30 ngày
