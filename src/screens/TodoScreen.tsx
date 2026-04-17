@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   StatusBar,
+  Dimensions,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {Todo, TodoCategory, Priority, FilterType} from '../types';
@@ -15,6 +16,9 @@ import {AddTodoModal} from '../components/AddTodoModal';
 import {StatsCard} from '../components/StatsCard';
 import {FilterTabs} from '../components/FilterTabs';
 import {COLORS, SPACING, BORDER_RADIUS, FONT_SIZE, SHADOWS} from '../constants/theme';
+
+const {width: SCREEN_WIDTH} = Dimensions.get('window');
+const isSmallScreen = SCREEN_WIDTH < 375;
 
 export const TodoScreen: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -184,7 +188,7 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: SPACING.lg,
     paddingBottom: SPACING.xl,
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.md,
   },
   headerContent: {
     flexDirection: 'row',
@@ -196,36 +200,38 @@ const styles = StyleSheet.create({
     marginRight: SPACING.md,
   },
   greeting: {
-    fontSize: FONT_SIZE.md,
+    fontSize: isSmallScreen ? FONT_SIZE.sm : FONT_SIZE.md,
     color: COLORS.surface,
     opacity: 0.9,
     marginBottom: SPACING.xs,
   },
   title: {
-    fontSize: FONT_SIZE.xxxl,
+    fontSize: isSmallScreen ? FONT_SIZE.xxl : FONT_SIZE.xxxl,
     fontWeight: 'bold',
     color: COLORS.surface,
-    lineHeight: FONT_SIZE.xxxl + 4,
+    lineHeight: isSmallScreen ? FONT_SIZE.xxl + 4 : FONT_SIZE.xxxl + 4,
   },
   subtitle: {
-    fontSize: FONT_SIZE.xxxl,
+    fontSize: isSmallScreen ? FONT_SIZE.xxl : FONT_SIZE.xxxl,
     fontWeight: 'bold',
     color: COLORS.surface,
-    lineHeight: FONT_SIZE.xxxl + 4,
+    lineHeight: isSmallScreen ? FONT_SIZE.xxl + 4 : FONT_SIZE.xxxl + 4,
   },
   dateContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.md,
+    minWidth: 50,
   },
   dateText: {
-    fontSize: FONT_SIZE.sm,
+    fontSize: FONT_SIZE.xs,
     color: COLORS.surface,
     fontWeight: '600',
+    textAlign: 'center',
   },
   listContent: {
-    padding: SPACING.md,
+    padding: SPACING.sm,
     paddingBottom: 100,
   },
   emptyContainer: {
@@ -250,19 +256,19 @@ const styles = StyleSheet.create({
   },
   fabWrapper: {
     position: 'absolute',
-    right: SPACING.lg,
-    bottom: SPACING.xl,
+    right: SPACING.md,
+    bottom: SPACING.lg,
     ...SHADOWS.lg,
   },
   fab: {
-    width: 64,
-    height: 64,
+    width: isSmallScreen ? 56 : 64,
+    height: isSmallScreen ? 56 : 64,
     borderRadius: BORDER_RADIUS.full,
     justifyContent: 'center',
     alignItems: 'center',
   },
   fabIcon: {
-    fontSize: 32,
+    fontSize: isSmallScreen ? 28 : 32,
     color: COLORS.surface,
     fontWeight: '300',
   },

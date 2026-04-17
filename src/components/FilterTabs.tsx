@@ -1,7 +1,10 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Dimensions} from 'react-native';
 import {FilterType} from '../types';
 import {COLORS, SPACING, BORDER_RADIUS, FONT_SIZE} from '../constants/theme';
+
+const {width: SCREEN_WIDTH} = Dimensions.get('window');
+const isSmallScreen = SCREEN_WIDTH < 375;
 
 interface FilterTabsProps {
   activeFilter: FilterType;
@@ -77,8 +80,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surfaceLight,
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.xs,
-    marginHorizontal: SPACING.md,
-    marginBottom: SPACING.md,
+    marginHorizontal: SPACING.sm,
+    marginBottom: SPACING.sm,
   },
   tab: {
     flex: 1,
@@ -86,9 +89,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: SPACING.sm,
-    paddingHorizontal: 4,
+    paddingHorizontal: 2,
     borderRadius: BORDER_RADIUS.sm,
-    minHeight: 60,
+    minHeight: isSmallScreen ? 55 : 60,
   },
   tabActive: {
     backgroundColor: COLORS.surface,
@@ -99,11 +102,11 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   icon: {
-    fontSize: FONT_SIZE.lg,
+    fontSize: isSmallScreen ? FONT_SIZE.md : FONT_SIZE.lg,
     marginBottom: SPACING.xs,
   },
   label: {
-    fontSize: FONT_SIZE.xs,
+    fontSize: isSmallScreen ? 10 : FONT_SIZE.xs,
     color: COLORS.textSecondary,
     fontWeight: '600',
     textAlign: 'center',
@@ -115,8 +118,8 @@ const styles = StyleSheet.create({
   badge: {
     backgroundColor: COLORS.border,
     borderRadius: BORDER_RADIUS.full,
-    minWidth: 20,
-    height: 20,
+    minWidth: 18,
+    height: 18,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: SPACING.xs,
@@ -125,7 +128,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   badgeText: {
-    fontSize: FONT_SIZE.xs,
+    fontSize: 10,
     color: COLORS.textSecondary,
     fontWeight: 'bold',
   },

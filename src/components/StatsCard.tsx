@@ -1,7 +1,10 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Dimensions} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {COLORS, SPACING, BORDER_RADIUS, FONT_SIZE, SHADOWS} from '../constants/theme';
+
+const {width: SCREEN_WIDTH} = Dimensions.get('window');
+const isSmallScreen = SCREEN_WIDTH < 375;
 
 interface StatsCardProps {
   total: number;
@@ -62,9 +65,9 @@ export const StatsCard: React.FC<StatsCardProps> = ({
 const styles = StyleSheet.create({
   container: {
     borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.lg,
-    marginHorizontal: SPACING.md,
-    marginBottom: SPACING.lg,
+    padding: isSmallScreen ? SPACING.md : SPACING.lg,
+    marginHorizontal: SPACING.sm,
+    marginBottom: SPACING.md,
     ...SHADOWS.lg,
   },
   content: {
@@ -75,36 +78,36 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   mainNumber: {
-    fontSize: FONT_SIZE.xxxl,
+    fontSize: isSmallScreen ? FONT_SIZE.xxl : FONT_SIZE.xxxl,
     fontWeight: 'bold',
     color: COLORS.surface,
   },
   mainLabel: {
-    fontSize: FONT_SIZE.md,
+    fontSize: isSmallScreen ? FONT_SIZE.sm : FONT_SIZE.md,
     color: COLORS.surface,
     opacity: 0.9,
     marginTop: SPACING.xs,
   },
   divider: {
     width: 1,
-    height: 60,
+    height: isSmallScreen ? 50 : 60,
     backgroundColor: COLORS.surface,
     opacity: 0.3,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: isSmallScreen ? SPACING.md : SPACING.lg,
   },
   statsRow: {
     flex: 1,
   },
   stat: {
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.xs,
   },
   statNumber: {
-    fontSize: FONT_SIZE.xl,
+    fontSize: isSmallScreen ? FONT_SIZE.lg : FONT_SIZE.xl,
     fontWeight: 'bold',
     color: COLORS.surface,
   },
   statLabel: {
-    fontSize: FONT_SIZE.sm,
+    fontSize: FONT_SIZE.xs,
     color: COLORS.surface,
     opacity: 0.8,
   },
@@ -112,7 +115,7 @@ const styles = StyleSheet.create({
     height: 6,
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
     borderRadius: BORDER_RADIUS.full,
-    marginTop: SPACING.md,
+    marginTop: SPACING.sm,
     overflow: 'hidden',
   },
   progressFill: {
