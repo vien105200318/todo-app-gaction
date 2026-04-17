@@ -1,0 +1,64 @@
+name: iOS Build Archive (No Signing)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-archive:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          pod install
+
+      - name: Build Archive (Unsigned)
+        run: |
+          cd ios
+          
+          # Build archive without signing
+          xcodebuild archive \
+            -workspace TodoApp.xcworkspace \
+            -scheme TodoApp \
+            -configuration Release \
+            -archivePath build/TodoApp.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            -allowProvisioningUpdates
+
+      - name: Create IPA (Unsigned)
+        run: |
+          cd ios
+          
+          # Export archive to IPA without signing
+          xcodebuild -exportArchive \
+            -archivePath build/TodoApp.xcarchive \
+            -exportPath build \
+            -exportOptionsPlist ../export-options-unsigned.plist
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: TodoApp-Unsigned-IPA-${{ github.run_number }}
+          path: ios/build/TodoApp.ipa
+          retention-days: 30
+
+      - name: Upload Archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: TodoApp-Archive-${{ github.run_number }}
+          path: ios/build/TodoApp.xcarchive
+          retention-days: 30

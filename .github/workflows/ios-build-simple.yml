@@ -1,0 +1,73 @@
+name: iOS Build Simple (No Certificate)
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Install Pods
+        run: |
+          cd ios
+          pod install
+
+      - name: Build for Simulator
+        run: |
+          cd ios
+          xcodebuild \
+            -workspace TodoApp.xcworkspace \
+            -scheme TodoApp \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -derivedDataPath ./build \
+            clean build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO
+
+      - name: Package App
+        run: |
+          cd ios/build/Build/Products/Debug-iphonesimulator
+          zip -r TodoApp.app.zip TodoApp.app
+          mv TodoApp.app.zip ../../../../../
+
+      - name: Upload App
+        uses: actions/upload-artifact@v4
+        with:
+          name: TodoApp-Debug-${{ github.run_number }}
+          path: ios/TodoApp.app.zip
+          retention-days: 30
+
+      - name: Build Info
+        run: |
+          echo "=========================================="
+          echo "✅ Build thành công!"
+          echo "=========================================="
+          echo ""
+          echo "📦 File: TodoApp.app.zip"
+          echo "🎯 Platform: iOS Simulator"
+          echo "⚙️  Configuration: Debug"
+          echo ""
+          echo "📥 Tải về từ Artifacts"
+          echo "🚀 Chạy trên Xcode Simulator"
+          echo ""
+          echo "⚠️  Lưu ý:"
+          echo "   - File này KHÔNG thể cài lên iPhone thật"
+          echo "   - Chỉ dùng để test trên Simulator"
+          echo "   - Để cài lên thiết bị thật, cần build có sign"
+          echo ""

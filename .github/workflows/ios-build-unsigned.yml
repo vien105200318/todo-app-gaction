@@ -1,0 +1,64 @@
+name: iOS Build (Unsigned - No Certificate Required)
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build-ios-unsigned:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          pod install
+
+      - name: Build iOS App (Unsigned)
+        run: |
+          cd ios
+          xcodebuild \
+            -workspace TodoApp.xcworkspace \
+            -scheme TodoApp \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Create App Bundle
+        run: |
+          cd ios/build/Build/Products/Debug-iphonesimulator
+          mkdir -p Payload
+          cp -r TodoApp.app Payload/
+          zip -r TodoApp-Simulator.zip Payload
+          mv TodoApp-Simulator.zip ../../../../../
+
+      - name: Upload Simulator Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: TodoApp-Simulator-${{ github.run_number }}
+          path: ios/TodoApp-Simulator.zip
+          retention-days: 30
+
+      - name: Build Summary
+        run: |
+          echo "✅ Build thành công!"
+          echo "📱 File: TodoApp-Simulator.zip"
+          echo "⚠️  Chỉ chạy được trên iOS Simulator"
+          echo "💡 Để cài lên thiết bị thật, cần build có sign"
