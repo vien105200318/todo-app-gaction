@@ -14,7 +14,6 @@ import LinearGradient from 'react-native-linear-gradient';
 import {TodoCategory, Priority} from '../types';
 import {COLORS, SPACING, BORDER_RADIUS, FONT_SIZE, SHADOWS} from '../constants/theme';
 import {CATEGORIES} from '../constants/categories';
-import {haptics} from '../utils/haptics';
 
 interface AddTodoModalProps {
   visible: boolean;
@@ -37,19 +36,16 @@ export const AddTodoModal: React.FC<AddTodoModalProps> = ({
       setText('');
       setCategory('personal');
       setPriority('medium');
-      haptics.success();
       onClose();
     }
   };
 
   const handleCategorySelect = (cat: TodoCategory) => {
     setCategory(cat);
-    haptics.selection();
   };
 
   const handlePrioritySelect = (pri: Priority) => {
     setPriority(pri);
-    haptics.selection();
   };
 
   return (

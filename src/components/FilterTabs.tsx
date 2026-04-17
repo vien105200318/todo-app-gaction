@@ -1,13 +1,7 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from 'react-native-reanimated';
 import {FilterType} from '../types';
 import {COLORS, SPACING, BORDER_RADIUS, FONT_SIZE} from '../constants/theme';
-import {haptics} from '../utils/haptics';
 
 interface FilterTabsProps {
   activeFilter: FilterType;
@@ -31,7 +25,6 @@ export const FilterTabs: React.FC<FilterTabsProps> = ({
   ];
 
   const handleFilterPress = (filter: FilterType) => {
-    haptics.selection();
     onFilterChange(filter);
   };
 

@@ -1,157 +1,81 @@
-import React, {useEffect} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Pressable} from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withTiming,
-  interpolate,
-  runOnJS,
-} from 'react-native-reanimated';
-import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+import React from 'react';
+import {View, Text, TouchableOpacity, StyleSheet, Animated} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {Todo} from '../types';
 import {COLORS, SPACING, BORDER_RADIUS, FONT_SIZE, SHADOWS} from '../constants/theme';
 import {CATEGORIES} from '../constants/categories';
-import {haptics} from '../utils/haptics';
 
 interface TodoItemProps {
   todo: Todo;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
-  onEdit?: (id: string) => void;
 }
 
 export const TodoItem: React.FC<TodoItemProps> = ({
   todo,
   onToggle,
   onDelete,
-  onEdit,
 }) => {
-  const translateX = useSharedValue(0);
-  const scale = useSharedValue(1);
-  const opacity = useSharedValue(1);
-  const checkScale = useSharedValue(todo.completed ? 1 : 0);
-
-  useEffect(() => {
-    checkScale.value = withSpring(todo.completed ? 1 : 0);
-  }, [todo.completed, checkScale]);
-
-  const panGesture = Gesture.Pan()
-    .onUpdate(e => {
-      translateX.value = e.translationX < 0 ? e.translationX : 0;
-    })
-    .onEnd(() => {
-      if (translateX.value < -100) {
-        translateX.value = withTiming(-200);
-        opacity.value = withTiming(0, {duration: 300}, () => {
-          runOnJS(onDelete)(todo.id);
-          runOnJS(haptics.success)();
-        });
-      } else {
-        translateX.value = withSpring(0);
-      }
-    });
-
-  const longPressGesture = Gesture.LongPress()
-    .minDuration(500)
-    .onStart(() => {
-      runOnJS(haptics.heavy)();
-      scale.value = withSpring(0.95);
-    })
-    .onEnd(() => {
-      scale.value = withSpring(1);
-      if (onEdit) {
-        runOnJS(onEdit)(todo.id);
-      }
-    });
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      {translateX: translateX.value},
-      {scale: scale.value},
-    ],
-    opacity: opacity.value,
-  }));
-
-  const deleteButtonStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(translateX.value, [0, -100], [0, 1]),
-  }));
-
-  const checkboxAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{scale: checkScale.value}],
-  }));
-
   const category = CATEGORIES[todo.category];
   const priorityColor = COLORS.priority[todo.priority];
 
-  const handleToggle = () => {
-    haptics.light();
-    onToggle(todo.id);
-  };
-
   return (
     <View style={styles.wrapper}>
-      <Animated.View style={[styles.deleteButton, deleteButtonStyle]}>
-        <LinearGradient
-          colors={COLORS.gradient.danger}
-          style={styles.deleteGradient}
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 0}}>
-          <Text style={styles.deleteText}>🗑️ Xóa</Text>
-        </LinearGradient>
-      </Animated.View>
-
-      <GestureDetector gesture={Gesture.Simultaneous(panGesture, longPressGesture)}>
-        <Animated.View style={[styles.container, animatedStyle]}>
-          <View style={[styles.priorityBar, {backgroundColor: priorityColor}]} />
-          
-          <Pressable
-            style={[styles.checkbox, {borderColor: category.color}]}
-            onPress={handleToggle}>
-            <Animated.View
+      <View style={styles.container}>
+        <View style={[styles.priorityBar, {backgroundColor: priorityColor}]} />
+        
+        <TouchableOpacity
+          style={[styles.checkbox, {borderColor: category.color}]}
+          onPress={() => onToggle(todo.id)}>
+          {todo.completed && (
+            <View
               style={[
                 styles.checkboxInner,
                 {backgroundColor: category.color},
-                checkboxAnimatedStyle,
               ]}
             />
-          </Pressable>
+          )}
+        </TouchableOpacity>
 
-          <View style={styles.content}>
-            <View style={styles.header}>
-              <Text style={styles.categoryIcon}>{category.icon}</Text>
-              <Text style={[styles.categoryText, {color: category.color}]}>
-                {category.label}
-              </Text>
-            </View>
-            
-            <Text
-              style={[
-                styles.text,
-                todo.completed && styles.completedText,
-              ]}
-              numberOfLines={2}>
-              {todo.text}
-            </Text>
-            
-            <Text style={styles.timestamp}>
-              {new Date(todo.createdAt).toLocaleDateString('vi-VN', {
-                day: '2-digit',
-                month: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
+        <View style={styles.content}>
+          <View style={styles.header}>
+            <Text style={styles.categoryIcon}>{category.icon}</Text>
+            <Text style={[styles.categoryText, {color: category.color}]}>
+              {category.label}
             </Text>
           </View>
+          
+          <Text
+            style={[
+              styles.text,
+              todo.completed && styles.completedText,
+            ]}
+            numberOfLines={2}>
+            {todo.text}
+          </Text>
+          
+          <Text style={styles.timestamp}>
+            {new Date(todo.createdAt).toLocaleDateString('vi-VN', {
+              day: '2-digit',
+              month: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </Text>
+        </View>
 
-          {todo.completed && (
-            <View style={styles.completedBadge}>
-              <Text style={styles.completedBadgeText}>✓</Text>
-            </View>
-          )}
-        </Animated.View>
-      </GestureDetector>
+        {todo.completed && (
+          <View style={styles.completedBadge}>
+            <Text style={styles.completedBadgeText}>✓</Text>
+          </View>
+        )}
+
+        <TouchableOpacity
+          onPress={() => onDelete(todo.id)}
+          style={styles.deleteButton}>
+          <Text style={styles.deleteText}>🗑️</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -239,24 +163,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   deleteButton: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    bottom: 0,
-    width: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  deleteGradient: {
-    flex: 1,
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: BORDER_RADIUS.lg,
+    padding: SPACING.sm,
+    marginLeft: SPACING.xs,
   },
   deleteText: {
-    color: COLORS.surface,
-    fontSize: FONT_SIZE.md,
-    fontWeight: 'bold',
+    fontSize: FONT_SIZE.lg,
   },
 });

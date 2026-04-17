@@ -9,14 +9,12 @@ import {
   StatusBar,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Todo, TodoCategory, Priority, FilterType} from '../types';
 import {TodoItem} from '../components/TodoItem';
 import {AddTodoModal} from '../components/AddTodoModal';
 import {StatsCard} from '../components/StatsCard';
 import {FilterTabs} from '../components/FilterTabs';
 import {COLORS, SPACING, BORDER_RADIUS, FONT_SIZE, SHADOWS} from '../constants/theme';
-import {haptics} from '../utils/haptics';
 
 export const TodoScreen: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -72,7 +70,6 @@ export const TodoScreen: React.FC = () => {
   }, [todos]);
 
   const handleAddPress = () => {
-    haptics.light();
     setModalVisible(true);
   };
 
@@ -95,9 +92,8 @@ export const TodoScreen: React.FC = () => {
   );
 
   return (
-    <GestureHandlerRootView style={styles.flex}>
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" />
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" />
         
         {/* Header with gradient */}
         <LinearGradient
@@ -176,14 +172,10 @@ export const TodoScreen: React.FC = () => {
           onAdd={addTodo}
         />
       </SafeAreaView>
-    </GestureHandlerRootView>
   );
 };
 
 const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
