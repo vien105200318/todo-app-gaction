@@ -102,9 +102,10 @@ export const TodoScreen: React.FC = () => {
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1}}>
           <View style={styles.headerContent}>
-            <View>
+            <View style={styles.headerLeft}>
               <Text style={styles.greeting}>Xin chào! 👋</Text>
-              <Text style={styles.title}>Công việc hôm nay</Text>
+              <Text style={styles.title}>Công việc</Text>
+              <Text style={styles.subtitle}>hôm nay</Text>
             </View>
             <View style={styles.dateContainer}>
               <Text style={styles.dateText}>
@@ -188,7 +189,11 @@ const styles = StyleSheet.create({
   headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+  },
+  headerLeft: {
+    flex: 1,
+    marginRight: SPACING.md,
   },
   greeting: {
     fontSize: FONT_SIZE.md,
@@ -200,6 +205,13 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.xxxl,
     fontWeight: 'bold',
     color: COLORS.surface,
+    lineHeight: FONT_SIZE.xxxl + 4,
+  },
+  subtitle: {
+    fontSize: FONT_SIZE.xxxl,
+    fontWeight: 'bold',
+    color: COLORS.surface,
+    lineHeight: FONT_SIZE.xxxl + 4,
   },
   dateContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',

@@ -47,7 +47,8 @@ export const FilterTabs: React.FC<FilterTabsProps> = ({
               style={[
                 styles.label,
                 isActive && styles.labelActive,
-              ]}>
+              ]}
+              numberOfLines={1}>
               {filter.label}
             </Text>
             <View
@@ -81,12 +82,13 @@ const styles = StyleSheet.create({
   },
   tab: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: SPACING.sm,
-    paddingHorizontal: SPACING.xs,
+    paddingHorizontal: 4,
     borderRadius: BORDER_RADIUS.sm,
+    minHeight: 60,
   },
   tabActive: {
     backgroundColor: COLORS.surface,
@@ -97,14 +99,15 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   icon: {
-    fontSize: FONT_SIZE.md,
-    marginRight: SPACING.xs,
+    fontSize: FONT_SIZE.lg,
+    marginBottom: SPACING.xs,
   },
   label: {
-    fontSize: FONT_SIZE.sm,
+    fontSize: FONT_SIZE.xs,
     color: COLORS.textSecondary,
     fontWeight: '600',
-    marginRight: SPACING.xs,
+    textAlign: 'center',
+    marginBottom: SPACING.xs,
   },
   labelActive: {
     color: COLORS.text,
