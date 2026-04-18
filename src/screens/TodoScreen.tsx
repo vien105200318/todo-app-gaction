@@ -201,30 +201,18 @@ export const TodoScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
 
-      {/* Header */}
-      <LinearGradient
-        colors={COLORS.gradient.primary}
-        style={styles.header}
-        start={{x: 0, y: 0}}
-        end={{x: 1, y: 1}}>
-        <View style={styles.headerContent}>
-          <View style={styles.headerLeft}>
-            <Text style={styles.greeting}>Xin chào! 👋</Text>
-            <Text style={styles.title}>Công việc</Text>
-            <Text style={styles.subtitle}>hôm nay</Text>
-          </View>
-          <View style={styles.dateContainer}>
-            <Text style={styles.dateText}>
-              {new Date().toLocaleDateString('vi-VN', {
-                day: '2-digit',
-                month: 'short',
-              })}
-            </Text>
-          </View>
-        </View>
-      </LinearGradient>
+      {/* Simple Header */}
+      <View style={styles.header}>
+        <Text style={styles.title}>📝 Todo App</Text>
+        <Text style={styles.dateText}>
+          {new Date().toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: 'short',
+          })}
+        </Text>
+      </View>
 
       {/* Stats */}
       <StatsCard total={stats.total} completed={stats.completed} active={stats.active} />
@@ -319,49 +307,24 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   header: {
-    paddingTop: SPACING.lg,
-    paddingBottom: SPACING.xl,
-    paddingHorizontal: SPACING.md,
-  },
-  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  headerLeft: {
-    flex: 1,
-    marginRight: SPACING.md,
-  },
-  greeting: {
-    fontSize: isSmallScreen ? FONT_SIZE.sm : FONT_SIZE.md,
-    color: COLORS.surface,
-    opacity: 0.9,
-    marginBottom: SPACING.xs,
+    alignItems: 'center',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
+    backgroundColor: COLORS.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
   title: {
-    fontSize: isSmallScreen ? FONT_SIZE.xxl : FONT_SIZE.xxxl,
+    fontSize: FONT_SIZE.xl,
     fontWeight: 'bold',
-    color: COLORS.surface,
-    lineHeight: isSmallScreen ? FONT_SIZE.xxl + 4 : FONT_SIZE.xxxl + 4,
-  },
-  subtitle: {
-    fontSize: isSmallScreen ? FONT_SIZE.xxl : FONT_SIZE.xxxl,
-    fontWeight: 'bold',
-    color: COLORS.surface,
-    lineHeight: isSmallScreen ? FONT_SIZE.xxl + 4 : FONT_SIZE.xxxl + 4,
-  },
-  dateContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-    borderRadius: BORDER_RADIUS.md,
-    minWidth: 50,
+    color: COLORS.text,
   },
   dateText: {
-    fontSize: FONT_SIZE.xs,
-    color: COLORS.surface,
+    fontSize: FONT_SIZE.sm,
+    color: COLORS.textSecondary,
     fontWeight: '600',
-    textAlign: 'center',
   },
   searchContainer: {
     flexDirection: 'row',
