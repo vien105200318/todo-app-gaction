@@ -1,39 +1,66 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Animated} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Dimensions} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {Todo} from '../types';
 import {COLORS, SPACING, BORDER_RADIUS, FONT_SIZE, SHADOWS} from '../constants/theme';
 import {CATEGORIES} from '../constants/categories';
 
+const {width: SCREEN_WIDTH} = Dimensions.get('window');
+const isSmallScreen = SCREEN_WIDTH < 375;
+
 interface TodoItemProps {
   todo: Todo;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
+  onEdit: (id: string) => void;
 }
 
 export const TodoItem: React.FC<TodoItemProps> = ({
   todo,
   onToggle,
   onDelete,
+  onEdit,
 }) => {
   const category = CATEGORIES[todo.category];
   const priorityColor = COLORS.priority[todo.priority];
 
+  const isOverdue = todo.dueDate && todo.dueDate < Date.now() && !todo.completed;
+  const isDueToday =
+    todo.dueDate &&
+    todo.dueDate >= new Date().setHours(0, 0, 0, 0) &&
+    todo.dueDate <= new Date().setHours(23, 59, 59, 999);
+
+  const formatDueDate = (timestamp: number) => {
+    const date = new Date(timestamp);
+    const today = new Date().setHours(0, 0, 0, 0);
+    const tomorrow = today + 86400000;
+
+    if (timestamp >= today && timestamp < today + 86400000) {
+      return `Hôm nay ${date.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'})}`;
+    } else if (timestamp >= tomorrow && timestamp < tomorrow + 86400000) {
+      return `Ngày mai ${date.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'})}`;
+    }
+    return date.toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
   return (
-    <View style={styles.wrapper}>
-      <View style={styles.container}>
+    <TouchableOpacity
+      onLongPress={() => onEdit(todo.id)}
+      activeOpacity={0.7}
+      style={styles.wrapper}>
+      <View style={[styles.container, isOverdue && styles.overdueContainer]}>
         <View style={[styles.priorityBar, {backgroundColor: priorityColor}]} />
-        
+
         <TouchableOpacity
           style={[styles.checkbox, {borderColor: category.color}]}
           onPress={() => onToggle(todo.id)}>
           {todo.completed && (
-            <View
-              style={[
-                styles.checkboxInner,
-                {backgroundColor: category.color},
-              ]}
-            />
+            <View style={[styles.checkboxInner, {backgroundColor: category.color}]} />
           )}
         </TouchableOpacity>
 
@@ -43,25 +70,32 @@ export const TodoItem: React.FC<TodoItemProps> = ({
             <Text style={[styles.categoryText, {color: category.color}]}>
               {category.label}
             </Text>
+            {todo.reminder && !todo.completed && (
+              <Text style={styles.reminderIcon}>🔔</Text>
+            )}
           </View>
-          
-          <Text
-            style={[
-              styles.text,
-              todo.completed && styles.completedText,
-            ]}
-            numberOfLines={2}>
+
+          <Text style={[styles.text, todo.completed && styles.completedText]} numberOfLines={2}>
             {todo.text}
           </Text>
-          
-          <Text style={styles.timestamp}>
-            {new Date(todo.createdAt).toLocaleDateString('vi-VN', {
-              day: '2-digit',
-              month: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </Text>
+
+          {todo.dueDate && (
+            <Text
+              style={[
+                styles.dueDate,
+                isOverdue && styles.overdueDueDate,
+                isDueToday && styles.todayDueDate,
+              ]}>
+              {isOverdue ? '⚠️ ' : isDueToday ? '📅 ' : '📆 '}
+              {formatDueDate(todo.dueDate)}
+            </Text>
+          )}
+
+          {todo.notes && (
+            <Text style={styles.notes} numberOfLines={1}>
+              📝 {todo.notes}
+            </Text>
+          )}
         </View>
 
         {todo.completed && (
@@ -70,28 +104,35 @@ export const TodoItem: React.FC<TodoItemProps> = ({
           </View>
         )}
 
-        <TouchableOpacity
-          onPress={() => onDelete(todo.id)}
-          style={styles.deleteButton}>
-          <Text style={styles.deleteText}>🗑️</Text>
-        </TouchableOpacity>
+        <View style={styles.actions}>
+          <TouchableOpacity onPress={() => onEdit(todo.id)} style={styles.actionBtn}>
+            <Text style={styles.actionIcon}>✏️</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => onDelete(todo.id)} style={styles.actionBtn}>
+            <Text style={styles.actionIcon}>🗑️</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.sm,
   },
   container: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.surface,
     borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.md,
+    padding: SPACING.sm,
     ...SHADOWS.md,
     overflow: 'hidden',
+  },
+  overdueContainer: {
+    borderWidth: 1,
+    borderColor: COLORS.danger,
   },
   priorityBar: {
     position: 'absolute',
@@ -101,18 +142,18 @@ const styles = StyleSheet.create({
     width: 4,
   },
   checkbox: {
-    width: 28,
-    height: 28,
+    width: 24,
+    height: 24,
     borderRadius: BORDER_RADIUS.full,
-    borderWidth: 2.5,
-    marginLeft: SPACING.sm,
-    marginRight: SPACING.md,
+    borderWidth: 2,
+    marginLeft: SPACING.xs,
+    marginRight: SPACING.sm,
     justifyContent: 'center',
     alignItems: 'center',
   },
   checkboxInner: {
-    width: 16,
-    height: 16,
+    width: 14,
+    height: 14,
     borderRadius: BORDER_RADIUS.full,
   },
   content: {
@@ -124,49 +165,70 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xs,
   },
   categoryIcon: {
-    fontSize: FONT_SIZE.md,
+    fontSize: isSmallScreen ? FONT_SIZE.sm : FONT_SIZE.md,
     marginRight: SPACING.xs,
   },
   categoryText: {
-    fontSize: FONT_SIZE.xs,
+    fontSize: isSmallScreen ? 10 : FONT_SIZE.xs,
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
+  reminderIcon: {
+    fontSize: FONT_SIZE.xs,
+    marginLeft: SPACING.xs,
+  },
   text: {
-    fontSize: FONT_SIZE.md,
+    fontSize: isSmallScreen ? FONT_SIZE.sm : FONT_SIZE.md,
     color: COLORS.text,
     fontWeight: '500',
-    lineHeight: 22,
+    lineHeight: 20,
   },
   completedText: {
     textDecorationLine: 'line-through',
     color: COLORS.textLight,
   },
-  timestamp: {
+  dueDate: {
     fontSize: FONT_SIZE.xs,
     color: COLORS.textSecondary,
     marginTop: SPACING.xs,
   },
+  overdueDueDate: {
+    color: COLORS.danger,
+    fontWeight: 'bold',
+  },
+  todayDueDate: {
+    color: COLORS.warning,
+    fontWeight: '600',
+  },
+  notes: {
+    fontSize: FONT_SIZE.xs,
+    color: COLORS.textSecondary,
+    fontStyle: 'italic',
+    marginTop: SPACING.xs,
+  },
   completedBadge: {
-    width: 32,
-    height: 32,
+    width: 28,
+    height: 28,
     borderRadius: BORDER_RADIUS.full,
     backgroundColor: COLORS.success,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: SPACING.sm,
+    marginLeft: SPACING.xs,
   },
   completedBadgeText: {
     color: COLORS.surface,
-    fontSize: FONT_SIZE.md,
+    fontSize: FONT_SIZE.sm,
     fontWeight: 'bold',
   },
-  deleteButton: {
-    padding: SPACING.sm,
+  actions: {
+    flexDirection: 'row',
     marginLeft: SPACING.xs,
   },
-  deleteText: {
-    fontSize: FONT_SIZE.lg,
+  actionBtn: {
+    padding: SPACING.xs,
+  },
+  actionIcon: {
+    fontSize: isSmallScreen ? FONT_SIZE.md : FONT_SIZE.lg,
   },
 });
