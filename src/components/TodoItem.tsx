@@ -125,7 +125,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
 
         {/* Actions */}
         <View style={styles.actions}>
-          <TouchableOpacity onPress={() => onEdit(todo.id)} style={styles.actionBtn}>
+          <TouchableOpacity onPress={() => onEdit(todo.id)} style={[styles.actionBtn, {marginBottom: SPACING.xs}]}>
             <View style={styles.actionBtnInner}>
               <Text style={styles.actionIcon}>✏️</Text>
             </View>
@@ -215,7 +215,6 @@ const styles = StyleSheet.create({
   categoryText: {
     fontSize: 10,
     fontWeight: '700',
-    textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   reminderBadge: {
@@ -281,7 +280,6 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'column',
     marginLeft: SPACING.sm,
-    gap: SPACING.xs,
   },
   actionBtn: {
     padding: SPACING.xs,

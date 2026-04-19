@@ -35,14 +35,14 @@ export const StatsCard: React.FC<StatsCardProps> = ({
           </View>
 
           <View style={styles.statsGrid}>
-            <View style={styles.statItem}>
+            <View style={[styles.statItem, {marginRight: SPACING.md}]}>
               <View style={[styles.statIconContainer, {backgroundColor: 'rgba(255,255,255,0.25)'}]}>
                 <Text style={styles.statIcon}>📋</Text>
               </View>
               <Text style={styles.statNumber}>{total}</Text>
               <Text style={styles.statLabel}>Tổng</Text>
             </View>
-            <View style={styles.statItem}>
+            <View style={[styles.statItem, {marginRight: SPACING.md}]}>
               <View style={[styles.statIconContainer, {backgroundColor: 'rgba(255,255,255,0.25)'}]}>
                 <Text style={styles.statIcon}>⏳</Text>
               </View>
@@ -112,7 +112,6 @@ const styles = StyleSheet.create({
   },
   statsGrid: {
     flexDirection: 'row',
-    gap: SPACING.md,
   },
   statItem: {
     alignItems: 'center',

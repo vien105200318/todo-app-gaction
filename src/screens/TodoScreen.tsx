@@ -200,8 +200,8 @@ export const TodoScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" />
 
       {/* Modern Header with Gradient */}
       <LinearGradient
@@ -209,22 +209,20 @@ export const TodoScreen: React.FC = () => {
         start={{x: 0, y: 0}}
         end={{x: 1, y: 1}}
         style={styles.headerGradient}>
-        <SafeAreaView>
-          <View style={styles.header}>
-            <View>
-              <Text style={styles.greeting}>Xin chào! 👋</Text>
-              <Text style={styles.title}>Công việc hôm nay</Text>
-            </View>
-            <View style={styles.dateContainer}>
-              <Text style={styles.dateDay}>
-                {new Date().toLocaleDateString('vi-VN', {day: '2-digit'})}
-              </Text>
-              <Text style={styles.dateMonth}>
-                {new Date().toLocaleDateString('vi-VN', {month: 'short'})}
-              </Text>
-            </View>
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.greeting}>Xin chào! 👋</Text>
+            <Text style={styles.title}>Công việc hôm nay</Text>
           </View>
-        </SafeAreaView>
+          <View style={styles.dateContainer}>
+            <Text style={styles.dateDay}>
+              {new Date().toLocaleDateString('vi-VN', {day: '2-digit'})}
+            </Text>
+            <Text style={styles.dateMonth}>
+              {new Date().toLocaleDateString('vi-VN', {month: 'short'})}
+            </Text>
+          </View>
+        </View>
       </LinearGradient>
 
       {/* Stats Card */}
@@ -319,7 +317,7 @@ export const TodoScreen: React.FC = () => {
         }}
         onSave={saveTodo}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -366,7 +364,6 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.xs,
     color: COLORS.surface,
     opacity: 0.9,
-    textTransform: 'uppercase',
     marginTop: 2,
   },
   statsWrapper: {
