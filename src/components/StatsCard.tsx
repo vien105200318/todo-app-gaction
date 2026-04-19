@@ -20,102 +20,131 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return (
-    <LinearGradient
-      colors={COLORS.gradient.primary}
-      style={styles.container}
-      start={{x: 0, y: 0}}
-      end={{x: 1, y: 1}}>
-      <View style={styles.content}>
-        <View style={styles.mainStat}>
-          <Text style={styles.mainNumber}>{completionRate}%</Text>
-          <Text style={styles.mainLabel}>Hoàn thành</Text>
+    <View style={styles.container}>
+      <LinearGradient
+        colors={COLORS.gradient.primary}
+        style={styles.gradient}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}>
+        <View style={styles.content}>
+          <View style={styles.mainStat}>
+            <View style={styles.percentageCircle}>
+              <Text style={styles.mainNumber}>{completionRate}%</Text>
+            </View>
+            <Text style={styles.mainLabel}>Hoàn thành</Text>
+          </View>
+
+          <View style={styles.statsGrid}>
+            <View style={styles.statItem}>
+              <View style={[styles.statIconContainer, {backgroundColor: 'rgba(255,255,255,0.25)'}]}>
+                <Text style={styles.statIcon}>📋</Text>
+              </View>
+              <Text style={styles.statNumber}>{total}</Text>
+              <Text style={styles.statLabel}>Tổng</Text>
+            </View>
+            <View style={styles.statItem}>
+              <View style={[styles.statIconContainer, {backgroundColor: 'rgba(255,255,255,0.25)'}]}>
+                <Text style={styles.statIcon}>⏳</Text>
+              </View>
+              <Text style={styles.statNumber}>{active}</Text>
+              <Text style={styles.statLabel}>Đang làm</Text>
+            </View>
+            <View style={styles.statItem}>
+              <View style={[styles.statIconContainer, {backgroundColor: 'rgba(255,255,255,0.25)'}]}>
+                <Text style={styles.statIcon}>✅</Text>
+              </View>
+              <Text style={styles.statNumber}>{completed}</Text>
+              <Text style={styles.statLabel}>Hoàn thành</Text>
+            </View>
+          </View>
         </View>
 
-        <View style={styles.divider} />
-
-        <View style={styles.statsRow}>
-          <View style={styles.stat}>
-            <Text style={styles.statNumber}>{total}</Text>
-            <Text style={styles.statLabel}>Tổng</Text>
-          </View>
-          <View style={styles.stat}>
-            <Text style={styles.statNumber}>{active}</Text>
-            <Text style={styles.statLabel}>Đang làm</Text>
-          </View>
-          <View style={styles.stat}>
-            <Text style={styles.statNumber}>{completed}</Text>
-            <Text style={styles.statLabel}>Xong</Text>
-          </View>
+        {/* Progress bar */}
+        <View style={styles.progressBar}>
+          <View
+            style={[
+              styles.progressFill,
+              {width: `${completionRate}%`},
+            ]}
+          />
         </View>
-      </View>
-
-      {/* Progress bar */}
-      <View style={styles.progressBar}>
-        <View
-          style={[
-            styles.progressFill,
-            {width: `${completionRate}%`},
-          ]}
-        />
-      </View>
-    </LinearGradient>
+      </LinearGradient>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: BORDER_RADIUS.lg,
-    padding: isSmallScreen ? SPACING.md : SPACING.lg,
-    marginHorizontal: SPACING.sm,
-    marginBottom: SPACING.md,
     ...SHADOWS.lg,
+  },
+  gradient: {
+    borderRadius: BORDER_RADIUS.xl,
+    padding: isSmallScreen ? SPACING.md : SPACING.lg,
+    overflow: 'hidden',
   },
   content: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   mainStat: {
-    flex: 1,
+    alignItems: 'center',
+  },
+  percentageCircle: {
+    width: isSmallScreen ? 80 : 90,
+    height: isSmallScreen ? 80 : 90,
+    borderRadius: BORDER_RADIUS.full,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
   },
   mainNumber: {
-    fontSize: isSmallScreen ? FONT_SIZE.xxl : FONT_SIZE.xxxl,
+    fontSize: isSmallScreen ? FONT_SIZE.xl : FONT_SIZE.xxl,
     fontWeight: 'bold',
     color: COLORS.surface,
   },
   mainLabel: {
-    fontSize: isSmallScreen ? FONT_SIZE.sm : FONT_SIZE.md,
+    fontSize: FONT_SIZE.sm,
     color: COLORS.surface,
-    opacity: 0.9,
-    marginTop: SPACING.xs,
+    opacity: 0.95,
+    fontWeight: '600',
   },
-  divider: {
-    width: 1,
-    height: isSmallScreen ? 50 : 60,
-    backgroundColor: COLORS.surface,
-    opacity: 0.3,
-    marginHorizontal: isSmallScreen ? SPACING.md : SPACING.lg,
+  statsGrid: {
+    flexDirection: 'row',
+    gap: SPACING.md,
   },
-  statsRow: {
-    flex: 1,
+  statItem: {
+    alignItems: 'center',
   },
-  stat: {
+  statIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: BORDER_RADIUS.md,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: SPACING.xs,
   },
+  statIcon: {
+    fontSize: FONT_SIZE.lg,
+  },
   statNumber: {
-    fontSize: isSmallScreen ? FONT_SIZE.lg : FONT_SIZE.xl,
+    fontSize: FONT_SIZE.xl,
     fontWeight: 'bold',
     color: COLORS.surface,
+    marginBottom: 2,
   },
   statLabel: {
-    fontSize: FONT_SIZE.xs,
+    fontSize: 10,
     color: COLORS.surface,
-    opacity: 0.8,
+    opacity: 0.9,
+    fontWeight: '500',
   },
   progressBar: {
-    height: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    height: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     borderRadius: BORDER_RADIUS.full,
-    marginTop: SPACING.sm,
+    marginTop: SPACING.md,
     overflow: 'hidden',
   },
   progressFill: {

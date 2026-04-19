@@ -81,11 +81,13 @@ export const FilterTabs: React.FC<FilterTabsProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: COLORS.surfaceLight,
-    borderRadius: BORDER_RADIUS.md,
+    backgroundColor: COLORS.surface,
+    borderRadius: BORDER_RADIUS.lg,
     padding: SPACING.xs,
-    marginHorizontal: SPACING.sm,
+    marginHorizontal: SPACING.md,
+    marginTop: SPACING.md,
     marginBottom: SPACING.sm,
+    ...SHADOWS.sm,
   },
   tab: {
     flex: 1,
@@ -94,19 +96,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: SPACING.sm,
     paddingHorizontal: 2,
-    borderRadius: BORDER_RADIUS.sm,
-    minHeight: isSmallScreen ? 55 : 60,
+    borderRadius: BORDER_RADIUS.md,
+    minHeight: isSmallScreen ? 60 : 65,
   },
   tabActive: {
-    backgroundColor: COLORS.surface,
-    shadowColor: COLORS.shadow,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    backgroundColor: COLORS.primary,
+    ...SHADOWS.md,
   },
   icon: {
-    fontSize: isSmallScreen ? FONT_SIZE.md : FONT_SIZE.lg,
+    fontSize: isSmallScreen ? FONT_SIZE.lg : FONT_SIZE.xl,
     marginBottom: SPACING.xs,
   },
   label: {
@@ -117,19 +115,20 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xs,
   },
   labelActive: {
-    color: COLORS.text,
+    color: COLORS.surface,
+    fontWeight: '700',
   },
   badge: {
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.surfaceLight,
     borderRadius: BORDER_RADIUS.full,
-    minWidth: 18,
-    height: 18,
+    minWidth: 20,
+    height: 20,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: SPACING.xs,
   },
   badgeActive: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
   },
   badgeText: {
     fontSize: 10,
@@ -138,5 +137,6 @@ const styles = StyleSheet.create({
   },
   badgeTextActive: {
     color: COLORS.surface,
+    fontWeight: 'bold',
   },
 });

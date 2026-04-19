@@ -53,63 +53,87 @@ export const TodoItem: React.FC<TodoItemProps> = ({
       onLongPress={() => onEdit(todo.id)}
       activeOpacity={0.7}
       style={styles.wrapper}>
-      <View style={[styles.container, isOverdue && styles.overdueContainer]}>
+      <View style={[styles.container, isOverdue && styles.overdueContainer, todo.completed && styles.completedContainer]}>
+        {/* Priority Indicator */}
         <View style={[styles.priorityBar, {backgroundColor: priorityColor}]} />
 
+        {/* Checkbox */}
         <TouchableOpacity
-          style={[styles.checkbox, {borderColor: category.color}]}
-          onPress={() => onToggle(todo.id)}>
+          style={[styles.checkbox, {borderColor: todo.completed ? category.color : COLORS.border}]}
+          onPress={() => onToggle(todo.id)}
+          activeOpacity={0.7}>
           {todo.completed && (
-            <View style={[styles.checkboxInner, {backgroundColor: category.color}]} />
+            <LinearGradient
+              colors={[category.color, category.color + 'CC']}
+              style={styles.checkboxInner}>
+              <Text style={styles.checkIcon}>✓</Text>
+            </LinearGradient>
           )}
         </TouchableOpacity>
 
+        {/* Content */}
         <View style={styles.content}>
-          <View style={styles.header}>
-            <Text style={styles.categoryIcon}>{category.icon}</Text>
-            <Text style={[styles.categoryText, {color: category.color}]}>
-              {category.label}
-            </Text>
+          {/* Category Badge */}
+          <View style={styles.headerRow}>
+            <View style={[styles.categoryBadge, {backgroundColor: category.color + '15'}]}>
+              <Text style={styles.categoryIcon}>{category.icon}</Text>
+              <Text style={[styles.categoryText, {color: category.color}]}>
+                {category.label}
+              </Text>
+            </View>
             {todo.reminder && !todo.completed && (
-              <Text style={styles.reminderIcon}>🔔</Text>
+              <View style={styles.reminderBadge}>
+                <Text style={styles.reminderIcon}>🔔</Text>
+              </View>
             )}
           </View>
 
+          {/* Todo Text */}
           <Text style={[styles.text, todo.completed && styles.completedText]} numberOfLines={2}>
             {todo.text}
           </Text>
 
+          {/* Due Date */}
           {todo.dueDate && (
-            <Text
+            <View
               style={[
-                styles.dueDate,
-                isOverdue && styles.overdueDueDate,
-                isDueToday && styles.todayDueDate,
+                styles.dueDateContainer,
+                isOverdue && styles.overdueDueDateContainer,
+                isDueToday && styles.todayDueDateContainer,
               ]}>
-              {isOverdue ? '⚠️ ' : isDueToday ? '📅 ' : '📆 '}
-              {formatDueDate(todo.dueDate)}
-            </Text>
+              <Text style={styles.dueDateIcon}>
+                {isOverdue ? '⚠️' : isDueToday ? '📅' : '📆'}
+              </Text>
+              <Text
+                style={[
+                  styles.dueDate,
+                  isOverdue && styles.overdueDueDate,
+                  isDueToday && styles.todayDueDate,
+                ]}>
+                {formatDueDate(todo.dueDate)}
+              </Text>
+            </View>
           )}
 
+          {/* Notes */}
           {todo.notes && (
             <Text style={styles.notes} numberOfLines={1}>
-              📝 {todo.notes}
+              💭 {todo.notes}
             </Text>
           )}
         </View>
 
-        {todo.completed && (
-          <View style={styles.completedBadge}>
-            <Text style={styles.completedBadgeText}>✓</Text>
-          </View>
-        )}
-
+        {/* Actions */}
         <View style={styles.actions}>
           <TouchableOpacity onPress={() => onEdit(todo.id)} style={styles.actionBtn}>
-            <Text style={styles.actionIcon}>✏️</Text>
+            <View style={styles.actionBtnInner}>
+              <Text style={styles.actionIcon}>✏️</Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => onDelete(todo.id)} style={styles.actionBtn}>
-            <Text style={styles.actionIcon}>🗑️</Text>
+            <View style={[styles.actionBtnInner, styles.deleteBtn]}>
+              <Text style={styles.actionIcon}>🗑️</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </View>
@@ -119,20 +143,26 @@ export const TodoItem: React.FC<TodoItemProps> = ({
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.md,
   },
   container: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.surface,
     borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.sm,
+    padding: SPACING.md,
     ...SHADOWS.md,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   overdueContainer: {
-    borderWidth: 1,
     borderColor: COLORS.danger,
+    backgroundColor: '#FEF2F2',
+  },
+  completedContainer: {
+    opacity: 0.7,
+    backgroundColor: COLORS.surfaceLight,
   },
   priorityBar: {
     position: 'absolute',
@@ -142,56 +172,94 @@ const styles = StyleSheet.create({
     width: 4,
   },
   checkbox: {
-    width: 24,
-    height: 24,
+    width: 28,
+    height: 28,
     borderRadius: BORDER_RADIUS.full,
-    borderWidth: 2,
+    borderWidth: 2.5,
     marginLeft: SPACING.xs,
-    marginRight: SPACING.sm,
+    marginRight: SPACING.md,
     justifyContent: 'center',
     alignItems: 'center',
   },
   checkboxInner: {
-    width: 14,
-    height: 14,
+    width: 24,
+    height: 24,
     borderRadius: BORDER_RADIUS.full,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkIcon: {
+    color: COLORS.surface,
+    fontSize: FONT_SIZE.sm,
+    fontWeight: 'bold',
   },
   content: {
     flex: 1,
   },
-  header: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING.sm,
+  },
+  categoryBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.full,
   },
   categoryIcon: {
-    fontSize: isSmallScreen ? FONT_SIZE.sm : FONT_SIZE.md,
+    fontSize: FONT_SIZE.sm,
     marginRight: SPACING.xs,
   },
   categoryText: {
-    fontSize: isSmallScreen ? 10 : FONT_SIZE.xs,
-    fontWeight: '600',
+    fontSize: 10,
+    fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
+  reminderBadge: {
+    marginLeft: SPACING.sm,
+  },
   reminderIcon: {
-    fontSize: FONT_SIZE.xs,
-    marginLeft: SPACING.xs,
+    fontSize: FONT_SIZE.sm,
   },
   text: {
     fontSize: isSmallScreen ? FONT_SIZE.sm : FONT_SIZE.md,
     color: COLORS.text,
-    fontWeight: '500',
-    lineHeight: 20,
+    fontWeight: '600',
+    lineHeight: 22,
+    marginBottom: SPACING.xs,
   },
   completedText: {
     textDecorationLine: 'line-through',
     color: COLORS.textLight,
+    fontWeight: '400',
+  },
+  dueDateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surfaceLight,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.sm,
+    alignSelf: 'flex-start',
+    marginTop: SPACING.xs,
+  },
+  overdueDueDateContainer: {
+    backgroundColor: '#FEE2E2',
+  },
+  todayDueDateContainer: {
+    backgroundColor: '#FEF3C7',
+  },
+  dueDateIcon: {
+    fontSize: FONT_SIZE.xs,
+    marginRight: SPACING.xs,
   },
   dueDate: {
     fontSize: FONT_SIZE.xs,
     color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
+    fontWeight: '600',
   },
   overdueDueDate: {
     color: COLORS.danger,
@@ -199,36 +267,37 @@ const styles = StyleSheet.create({
   },
   todayDueDate: {
     color: COLORS.warning,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   notes: {
     fontSize: FONT_SIZE.xs,
     color: COLORS.textSecondary,
     fontStyle: 'italic',
-    marginTop: SPACING.xs,
-  },
-  completedBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: BORDER_RADIUS.full,
-    backgroundColor: COLORS.success,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: SPACING.xs,
-  },
-  completedBadgeText: {
-    color: COLORS.surface,
-    fontSize: FONT_SIZE.sm,
-    fontWeight: 'bold',
+    marginTop: SPACING.sm,
+    paddingLeft: SPACING.sm,
+    borderLeftWidth: 2,
+    borderLeftColor: COLORS.border,
   },
   actions: {
-    flexDirection: 'row',
-    marginLeft: SPACING.xs,
+    flexDirection: 'column',
+    marginLeft: SPACING.sm,
+    gap: SPACING.xs,
   },
   actionBtn: {
     padding: SPACING.xs,
   },
+  actionBtnInner: {
+    width: 36,
+    height: 36,
+    borderRadius: BORDER_RADIUS.md,
+    backgroundColor: COLORS.surfaceLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteBtn: {
+    backgroundColor: '#FEE2E2',
+  },
   actionIcon: {
-    fontSize: isSmallScreen ? FONT_SIZE.md : FONT_SIZE.lg,
+    fontSize: FONT_SIZE.md,
   },
 });
