@@ -9,9 +9,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Switch,
 } from 'react-native';
-import DatePicker from 'react-native-date-picker';
 import LinearGradient from 'react-native-linear-gradient';
 import {TodoCategory, Priority} from '../types';
 import {COLORS, SPACING, BORDER_RADIUS, FONT_SIZE, SHADOWS} from '../constants/theme';
@@ -20,14 +18,7 @@ import {CATEGORIES} from '../constants/categories';
 interface AddTodoModalProps {
   visible: boolean;
   onClose: () => void;
-  onAdd: (
-    text: string,
-    category: TodoCategory,
-    priority: Priority,
-    dueDate?: number,
-    reminder?: number,
-    notes?: string,
-  ) => void;
+  onAdd: (text: string, category: TodoCategory, priority: Priority, notes?: string) => void;
 }
 
 export const AddTodoModal: React.FC<AddTodoModalProps> = ({visible, onClose, onAdd}) => {
@@ -35,30 +26,14 @@ export const AddTodoModal: React.FC<AddTodoModalProps> = ({visible, onClose, onA
   const [notes, setNotes] = useState('');
   const [category, setCategory] = useState<TodoCategory>('personal');
   const [priority, setPriority] = useState<Priority>('medium');
-  const [hasDueDate, setHasDueDate] = useState(false);
-  const [dueDate, setDueDate] = useState(new Date());
-  const [hasReminder, setHasReminder] = useState(false);
-  const [reminderDate, setReminderDate] = useState(new Date());
-  const [showDueDatePicker, setShowDueDatePicker] = useState(false);
-  const [showReminderPicker, setShowReminderPicker] = useState(false);
 
   const handleAdd = () => {
     if (text.trim()) {
-      onAdd(
-        text.trim(),
-        category,
-        priority,
-        hasDueDate ? dueDate.getTime() : undefined,
-        hasReminder ? reminderDate.getTime() : undefined,
-        notes.trim() || undefined,
-      );
-      // Reset form
+      onAdd(text.trim(), category, priority, notes.trim() || undefined);
       setText('');
       setNotes('');
       setCategory('personal');
       setPriority('medium');
-      setHasDueDate(false);
-      setHasReminder(false);
       onClose();
     }
   };
@@ -124,26 +99,6 @@ export const AddTodoModal: React.FC<AddTodoModalProps> = ({visible, onClose, onA
               })}
             </View>
 
-            <View style={styles.switchRow}>
-              <Text>📅 Hạn</Text>
-              <Switch value={hasDueDate} onValueChange={setHasDueDate} />
-            </View>
-            {hasDueDate && (
-              <TouchableOpacity style={styles.dateBtn} onPress={() => setShowDueDatePicker(true)}>
-                <Text>{dueDate.toLocaleString('vi-VN')}</Text>
-              </TouchableOpacity>
-            )}
-
-            <View style={styles.switchRow}>
-              <Text>🔔 Nhắc</Text>
-              <Switch value={hasReminder} onValueChange={setHasReminder} />
-            </View>
-            {hasReminder && (
-              <TouchableOpacity style={styles.dateBtn} onPress={() => setShowReminderPicker(true)}>
-                <Text>{reminderDate.toLocaleString('vi-VN')}</Text>
-              </TouchableOpacity>
-            )}
-
             <TouchableOpacity onPress={handleAdd} disabled={!text.trim()}>
               <LinearGradient
                 colors={text.trim() ? COLORS.gradient.primary : ['#DFE6E9', '#B2BEC3']}
@@ -153,30 +108,6 @@ export const AddTodoModal: React.FC<AddTodoModalProps> = ({visible, onClose, onA
             </TouchableOpacity>
           </ScrollView>
         </View>
-
-        <DatePicker
-          modal
-          open={showDueDatePicker}
-          date={dueDate}
-          onConfirm={date => {
-            setDueDate(date);
-            setShowDueDatePicker(false);
-          }}
-          onCancel={() => setShowDueDatePicker(false)}
-          minimumDate={new Date()}
-        />
-
-        <DatePicker
-          modal
-          open={showReminderPicker}
-          date={reminderDate}
-          onConfirm={date => {
-            setReminderDate(date);
-            setShowReminderPicker(false);
-          }}
-          onCancel={() => setShowReminderPicker(false)}
-          minimumDate={new Date()}
-        />
       </KeyboardAvoidingView>
     </Modal>
   );
@@ -190,7 +121,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: BORDER_RADIUS.xl,
     borderTopRightRadius: BORDER_RADIUS.xl,
     padding: SPACING.lg,
-    maxHeight: '85%',
+    maxHeight: '80%',
   },
   handle: {width: 40, height: 4, backgroundColor: COLORS.border, borderRadius: 2, alignSelf: 'center', marginBottom: SPACING.md},
   title: {fontSize: FONT_SIZE.xl, fontWeight: 'bold', marginBottom: SPACING.md},
@@ -199,9 +130,7 @@ const styles = StyleSheet.create({
   chip: {backgroundColor: COLORS.surfaceLight, borderRadius: BORDER_RADIUS.full, paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, marginRight: SPACING.xs, flexDirection: 'row', alignItems: 'center'},
   chipIcon: {fontSize: FONT_SIZE.md, marginRight: SPACING.xs},
   chipText: {fontSize: FONT_SIZE.sm, fontWeight: '600'},
-  row: {flexDirection: 'row', marginBottom: SPACING.sm},
-  switchRow: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: SPACING.sm},
-  dateBtn: {backgroundColor: COLORS.surfaceLight, padding: SPACING.md, borderRadius: BORDER_RADIUS.md, marginBottom: SPACING.sm},
+  row: {flexDirection: 'row', marginBottom: SPACING.md},
   addBtn: {borderRadius: BORDER_RADIUS.md, padding: SPACING.md, alignItems: 'center', marginTop: SPACING.md},
   addBtnText: {fontSize: FONT_SIZE.md, fontWeight: 'bold', color: COLORS.surface},
 });

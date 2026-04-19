@@ -6,15 +6,13 @@ export interface Todo {
   priority: Priority;
   createdAt: number;
   completedAt?: number;
-  dueDate?: number;
-  reminder?: number;
   notes?: string;
 }
 
 export type TodoCategory = 'work' | 'personal' | 'shopping' | 'health' | 'other';
 export type Priority = 'low' | 'medium' | 'high';
-export type FilterType = 'all' | 'active' | 'completed' | 'today' | 'upcoming';
-export type SortType = 'date' | 'priority' | 'dueDate' | 'category';
+export type FilterType = 'all' | 'active' | 'completed';
+export type SortType = 'date' | 'priority' | 'category';
 
 export interface CategoryConfig {
   icon: string;

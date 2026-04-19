@@ -13,8 +13,6 @@ interface FilterTabsProps {
     all: number;
     active: number;
     completed: number;
-    today: number;
-    upcoming: number;
   };
 }
 
@@ -27,8 +25,6 @@ export const FilterTabs: React.FC<FilterTabsProps> = ({
     {key: 'all', label: 'Tất cả', icon: '📋'},
     {key: 'active', label: 'Đang làm', icon: '⏳'},
     {key: 'completed', label: 'Xong', icon: '✅'},
-    {key: 'today', label: 'Hôm nay', icon: '📅'},
-    {key: 'upcoming', label: 'Sắp tới', icon: '📆'},
   ];
 
   const handleFilterPress = (filter: FilterType) => {

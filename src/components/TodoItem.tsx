@@ -15,95 +15,30 @@ interface TodoItemProps {
   onEdit: (id: string) => void;
 }
 
-export const TodoItem: React.FC<TodoItemProps> = ({
-  todo,
-  onToggle,
-  onDelete,
-  onEdit,
-}) => {
+export const TodoItem: React.FC<TodoItemProps> = ({todo, onToggle, onDelete, onEdit}) => {
   const category = CATEGORIES[todo.category];
   const priorityColor = COLORS.priority[todo.priority];
 
-  const isOverdue = todo.dueDate && todo.dueDate < Date.now() && !todo.completed;
-  const isDueToday =
-    todo.dueDate &&
-    todo.dueDate >= new Date().setHours(0, 0, 0, 0) &&
-    todo.dueDate <= new Date().setHours(23, 59, 59, 999);
-
-  const formatDueDate = (timestamp: number) => {
-    const date = new Date(timestamp);
-    const today = new Date().setHours(0, 0, 0, 0);
-    const tomorrow = today + 86400000;
-
-    if (timestamp >= today && timestamp < today + 86400000) {
-      return `Hôm nay ${date.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'})}`;
-    } else if (timestamp >= tomorrow && timestamp < tomorrow + 86400000) {
-      return `Ngày mai ${date.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'})}`;
-    }
-    return date.toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
   return (
-    <TouchableOpacity
-      onLongPress={() => onEdit(todo.id)}
-      activeOpacity={0.7}
-      style={styles.wrapper}>
-      <View style={[styles.container, isOverdue && styles.overdueContainer]}>
+    <TouchableOpacity onLongPress={() => onEdit(todo.id)} activeOpacity={0.7} style={styles.wrapper}>
+      <View style={styles.container}>
         <View style={[styles.priorityBar, {backgroundColor: priorityColor}]} />
-
-        <TouchableOpacity
-          style={[styles.checkbox, {borderColor: category.color}]}
-          onPress={() => onToggle(todo.id)}>
-          {todo.completed && (
-            <View style={[styles.checkboxInner, {backgroundColor: category.color}]} />
-          )}
+        <TouchableOpacity style={[styles.checkbox, {borderColor: category.color}]} onPress={() => onToggle(todo.id)}>
+          {todo.completed && <View style={[styles.checkboxInner, {backgroundColor: category.color}]} />}
         </TouchableOpacity>
-
         <View style={styles.content}>
           <View style={styles.header}>
             <Text style={styles.categoryIcon}>{category.icon}</Text>
-            <Text style={[styles.categoryText, {color: category.color}]}>
-              {category.label}
-            </Text>
-            {todo.reminder && !todo.completed && (
-              <Text style={styles.reminderIcon}>🔔</Text>
-            )}
+            <Text style={[styles.categoryText, {color: category.color}]}>{category.label}</Text>
           </View>
-
-          <Text style={[styles.text, todo.completed && styles.completedText]} numberOfLines={2}>
-            {todo.text}
-          </Text>
-
-          {todo.dueDate && (
-            <Text
-              style={[
-                styles.dueDate,
-                isOverdue && styles.overdueDueDate,
-                isDueToday && styles.todayDueDate,
-              ]}>
-              {isOverdue ? '⚠️ ' : isDueToday ? '📅 ' : '📆 '}
-              {formatDueDate(todo.dueDate)}
-            </Text>
-          )}
-
-          {todo.notes && (
-            <Text style={styles.notes} numberOfLines={1}>
-              📝 {todo.notes}
-            </Text>
-          )}
+          <Text style={[styles.text, todo.completed && styles.completedText]} numberOfLines={2}>{todo.text}</Text>
+          {todo.notes && <Text style={styles.notes} numberOfLines={1}>📝 {todo.notes}</Text>}
         </View>
-
         {todo.completed && (
           <View style={styles.completedBadge}>
             <Text style={styles.completedBadgeText}>✓</Text>
           </View>
         )}
-
         <View style={styles.actions}>
           <TouchableOpacity onPress={() => onEdit(todo.id)} style={styles.actionBtn}>
             <Text style={styles.actionIcon}>✏️</Text>
