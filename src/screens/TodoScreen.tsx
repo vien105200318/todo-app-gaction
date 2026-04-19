@@ -201,55 +201,39 @@ export const TodoScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
 
-      {/* Modern Header with Gradient */}
-      <LinearGradient
-        colors={COLORS.gradient.primary}
-        start={{x: 0, y: 0}}
-        end={{x: 1, y: 1}}
-        style={styles.headerGradient}>
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>Xin chào! 👋</Text>
-            <Text style={styles.title}>Công việc hôm nay</Text>
-          </View>
-          <View style={styles.dateContainer}>
-            <Text style={styles.dateDay}>
-              {new Date().toLocaleDateString('vi-VN', {day: '2-digit'})}
-            </Text>
-            <Text style={styles.dateMonth}>
-              {new Date().toLocaleDateString('vi-VN', {month: 'short'})}
-            </Text>
-          </View>
-        </View>
-      </LinearGradient>
-
-      {/* Stats Card */}
-      <View style={styles.statsWrapper}>
-        <StatsCard total={stats.total} completed={stats.completed} active={stats.active} />
+      {/* Simple Header */}
+      <View style={styles.header}>
+        <Text style={styles.title}>📝 Todo App</Text>
+        <Text style={styles.dateText}>
+          {new Date().toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: 'short',
+          })}
+        </Text>
       </View>
 
-      {/* Search Bar */}
-      <View style={styles.searchWrapper}>
-        <View style={styles.searchContainer}>
-          <Text style={styles.searchIcon}>🔍</Text>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Tìm kiếm công việc..."
-            placeholderTextColor={COLORS.textLight}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearBtn}>
-              <Text style={styles.clearIcon}>✕</Text>
-            </TouchableOpacity>
-          )}
-        </View>
+      {/* Stats */}
+      <StatsCard total={stats.total} completed={stats.completed} active={stats.active} />
+
+      {/* Search */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="🔍 Tìm kiếm..."
+          placeholderTextColor={COLORS.textLight}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearBtn}>
+            <Text>✕</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
-      {/* Filter Tabs */}
+      {/* Filters */}
       <FilterTabs
         activeFilter={filter}
         onFilterChange={setFilter}
@@ -270,7 +254,7 @@ export const TodoScreen: React.FC = () => {
         }}
       />
 
-      {/* Todo List */}
+      {/* List */}
       <FlatList
         data={filteredTodos}
         keyExtractor={item => item.id}
@@ -287,16 +271,12 @@ export const TodoScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
       />
 
-      {/* Floating Action Button */}
+      {/* FAB */}
       <TouchableOpacity
         style={styles.fabWrapper}
         onPress={() => setModalVisible(true)}
-        activeOpacity={0.85}>
-        <LinearGradient
-          colors={COLORS.gradient.primary}
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 1}}
-          style={styles.fab}>
+        activeOpacity={0.9}>
+        <LinearGradient colors={COLORS.gradient.primary} style={styles.fab}>
           <Text style={styles.fabIcon}>+</Text>
         </LinearGradient>
       </TouchableOpacity>
@@ -326,81 +306,47 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  headerGradient: {
-    paddingBottom: SPACING.lg,
-  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.sm,
-  },
-  greeting: {
-    fontSize: FONT_SIZE.sm,
-    color: COLORS.surface,
-    opacity: 0.9,
-    fontWeight: '500',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
+    backgroundColor: COLORS.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
   title: {
-    fontSize: isSmallScreen ? FONT_SIZE.xl : FONT_SIZE.xxl,
-    fontWeight: 'bold',
-    color: COLORS.surface,
-    marginTop: SPACING.xs,
-  },
-  dateContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.sm,
-    alignItems: 'center',
-    minWidth: 56,
-  },
-  dateDay: {
     fontSize: FONT_SIZE.xl,
     fontWeight: 'bold',
-    color: COLORS.surface,
+    color: COLORS.text,
   },
-  dateMonth: {
-    fontSize: FONT_SIZE.xs,
-    color: COLORS.surface,
-    opacity: 0.9,
-    marginTop: 2,
-  },
-  statsWrapper: {
-    marginTop: -SPACING.xl,
-    paddingHorizontal: SPACING.md,
-  },
-  searchWrapper: {
-    paddingHorizontal: SPACING.md,
-    marginTop: SPACING.md,
+  dateText: {
+    fontSize: FONT_SIZE.sm,
+    color: COLORS.textSecondary,
+    fontWeight: '600',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginHorizontal: SPACING.sm,
+    marginBottom: SPACING.sm,
     backgroundColor: COLORS.surface,
-    borderRadius: BORDER_RADIUS.lg,
+    borderRadius: BORDER_RADIUS.md,
     paddingHorizontal: SPACING.md,
     ...SHADOWS.sm,
   },
-  searchIcon: {
-    fontSize: FONT_SIZE.lg,
-    marginRight: SPACING.sm,
-  },
   searchInput: {
     flex: 1,
-    height: 48,
+    height: 44,
     fontSize: FONT_SIZE.md,
     color: COLORS.text,
   },
   clearBtn: {
-    padding: SPACING.sm,
-  },
-  clearIcon: {
-    fontSize: FONT_SIZE.md,
-    color: COLORS.textLight,
+    padding: SPACING.xs,
   },
   listContent: {
-    padding: SPACING.md,
+    padding: SPACING.sm,
     paddingBottom: 100,
   },
   emptyContainer: {
@@ -409,7 +355,7 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xxl * 2,
   },
   emptyIcon: {
-    fontSize: 72,
+    fontSize: 80,
     marginBottom: SPACING.lg,
   },
   emptyTitle: {
@@ -425,21 +371,20 @@ const styles = StyleSheet.create({
   },
   fabWrapper: {
     position: 'absolute',
-    right: SPACING.lg,
-    bottom: SPACING.xl,
-    ...SHADOWS.xl,
+    right: SPACING.md,
+    bottom: SPACING.lg,
+    ...SHADOWS.lg,
   },
   fab: {
-    width: isSmallScreen ? 60 : 68,
-    height: isSmallScreen ? 60 : 68,
+    width: isSmallScreen ? 56 : 64,
+    height: isSmallScreen ? 56 : 64,
     borderRadius: BORDER_RADIUS.full,
     justifyContent: 'center',
     alignItems: 'center',
   },
   fabIcon: {
-    fontSize: isSmallScreen ? 32 : 36,
+    fontSize: isSmallScreen ? 28 : 32,
     color: COLORS.surface,
-    fontWeight: '200',
-    lineHeight: isSmallScreen ? 32 : 36,
+    fontWeight: '300',
   },
 });

@@ -273,6 +273,7 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     marginBottom: SPACING.sm,
     marginTop: SPACING.sm,
+    textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   categoryScroll: {
